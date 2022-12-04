@@ -1,0 +1,19 @@
+{
+  "name": "envoltorio_twitch_graphql",
+  "version": "1.0.0",
+  "description": "Envoltorio de la API-REST de Twitch",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "author": "Alexander Véliz",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/explorer": "^2.0.1",
+    "apollo-server": "^3.11.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
