@@ -3,7 +3,9 @@ const { gql } = require("apollo-server");
 //Schema
 const typeDefs = gql`
   type Token {
-    token: String
+    access_token: String
+    expires_in: Int
+    token_type: String
   }
 
   type LiveStreams {
@@ -19,12 +21,19 @@ const typeDefs = gql`
     started_at: String
     language: String
     thumbnail_url: String
-    tag_ids: String
+    tag_ids: [String]
     is_mature: Boolean
+  }
+
+  type Token {
+    access_token: String
+    expires_in: Int
+    token_type: String
   }
 
   type Query {
     getLiveStreams: [LiveStreams]
+    getToken: Token
   }
 `;
 

@@ -7,20 +7,6 @@ require("dotenv").config({ path: "../variables.env" });
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => {
-    const token = req.headers["Authorization"] || "";
-    if (token) {
-      try {
-        const ususarioToken = jwt.verify(token, process.env.SECRETWORD);
-        return {
-          ususarioToken,
-        };
-      } catch (error) {
-        console.log("Hubo un error");
-        console.log(error);
-      }
-    }
-  },
 });
 
 //run server
