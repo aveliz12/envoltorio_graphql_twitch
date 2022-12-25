@@ -32,7 +32,7 @@ const resolvers = {
         const data = await response.json();
         store.put("token", data.access_token);
 
-        console.log(data);
+        return data;
       } catch (error) {
         console.log(error);
       }
@@ -40,7 +40,7 @@ const resolvers = {
     getLiveStreams: async () => {
       try {
         const response = await getJsonTokenData("streams");
-        console.log(response.data);
+        return response.data;
       } catch (error) {
         console.log(error);
       }
