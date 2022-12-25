@@ -45,6 +45,25 @@ const resolvers = {
         console.log(error);
       }
     },
+    getVideosByGame: async () => {
+      const response = await getJsonTokenData("streams");
+      const game_id = response.data.game_id;
+      console.log(game_id);
+      // const params = new URLSearchParams();
+      // params.append("game_id", game_id);
+      try {
+        // const resp = await getJsonTokenData("videos", {
+        //   body: params,
+        // });
+        // const _data = await resp.json();
+        // console.log(_data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    // getChannelInformation: async () => {},
+    // getClipsByUserId: async () => {},
+    // getInformationGameById: async () => {},
   },
 };
 

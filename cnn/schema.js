@@ -38,7 +38,7 @@ const typeDefs = gql`
     url: String
     thumbnail_url: String
     viewable: String
-    view_count: Double
+    view_count: Float
     language: String
     type: String
     duration: String
@@ -52,7 +52,7 @@ const typeDefs = gql`
     broadcaster_language: String
     game_id: String
     game_name: String
-    title: Stirng
+    title: String
     delay: Int
     tags: [String]
   }
@@ -72,7 +72,7 @@ const typeDefs = gql`
     view_count: Int
     created_at: String
     thumbnail_url: String
-    duration: Double
+    duration: Float
     vod_offset: String
   }
 
