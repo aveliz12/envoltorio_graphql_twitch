@@ -46,24 +46,45 @@ const resolvers = {
       }
     },
     getVideosByGame: async () => {
-      const response = await getJsonTokenData("streams");
-      const game_id = response.data.game_id;
-      console.log(game_id);
-      // const params = new URLSearchParams();
-      // params.append("game_id", game_id);
+      const responseStreams = await getJsonTokenData("streams");
+      const game_id = responseStreams.data.map((id) => {
+        return id.game_id;
+      });
+      const params = new URLSearchParams();
+      params.append("game_id", game_id[0]);
+
       try {
-        // const resp = await getJsonTokenData("videos", {
-        //   body: params,
-        // });
-        // const _data = await resp.json();
-        // console.log(_data);
+        const resp = await getJsonTokenData(`videos?${params}`);
+        return resp.data;
       } catch (error) {
         console.log(error);
       }
     },
-    // getChannelInformation: async () => {},
-    // getClipsByUserId: async () => {},
-    // getInformationGameById: async () => {},
+    getChannelInformation: async () => {
+      const responseStreams = await getJsonTokenData("streams");
+      const game_id = responseStreams.data.map((id) => {
+        return id.game_id;
+      });
+
+      const resp = await getJsonTokenData(`videos?game_id=${game_id[0]}`);
+      const idChannel = resp.data.map((idCha) => {
+        return idCha.user_id;
+      });
+
+      console.log(idChannel)
+
+      const params = new URLSearchParams();
+      params.append("broadcaster_id", idChannel[0]);
+
+      try {
+        const channelInformation = await getJsonTokenData(`channels?${params}`);
+        return channelInformation.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getClipsByUserId: async () => {},
+    getInformationGameById: async () => {},
   },
 };
 

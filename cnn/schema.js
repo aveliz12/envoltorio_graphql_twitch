@@ -87,7 +87,7 @@ const typeDefs = gql`
     getToken: Token
     getLiveStreams: [LiveStreams]
     getVideosByGame: [VideosByGame]
-    getChannelInformation: [ChannelInformation]
+    getChannelInformation: ChannelInformation
     getClipsByUserId: [ClipsByUserId]
     getInformationGameById: [InformationGameById]
   }
