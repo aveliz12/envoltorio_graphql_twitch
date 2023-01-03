@@ -94,20 +94,27 @@ const resolvers = {
         console.log(error);
       }
     },
-    getVideosByGame: async (_, { id }) => {
-      const response = await getJsonTokenData(`videos?game_id=${id}`);
-      return response.data;
-    },
-    getChannelInformation: async (_, { id }) => {
-      const response = await getJsonTokenData(`channels?broadcaster_id=${id}`);
-      return response.data;
-    },
-    getClipsByUserId: async (_, { id }) => {
-      const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
-      return response.data;
-    },
-    getInformationGameById: async (_, { id }) => {
-      const response = await getJsonTokenData(`games?id=${id}`);
+    // getVideosByGame: async (_, { id }) => {
+    //   const response = await getJsonTokenData(`videos?game_id=${id}`);
+    //   return response.data;
+    // },
+    // getChannelInformation: async (_, { id }) => {
+    //   const response = await getJsonTokenData(`channels?broadcaster_id=${id}`);
+    //   return response.data;
+    // },
+    // getClipsByUserId: async (_, { id }) => {
+    //   const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
+    //   return response.data;
+    // },
+    // getInformationGameById: async (_, { id }) => {
+    //   const response = await getJsonTokenData(`games?id=${id}`);
+    //   return response.data;
+    // },
+  },
+  LiveStreams: {
+    async videosByGame(video) {
+      const response = await getJsonTokenData(`videos?game_id=${video.game_id}`);
+      console.log(response.data)
       return response.data;
     },
   },

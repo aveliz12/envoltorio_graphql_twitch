@@ -19,6 +19,7 @@ type LiveStreams {
   thumbnail_url: String
   tag_ids: [String]
   is_mature: Boolean
+  videosByGame: [VideosByGame]
 }
 
 type VideosByGame {
