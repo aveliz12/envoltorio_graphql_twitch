@@ -86,6 +86,14 @@ const resolvers = {
         console.log(error);
       }
     },
+    getCasosPruebasLiveStreams: async () => {
+      try {
+        const response = await getJsonTokenData("streams");
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     getLiveStreams: async () => {
       try {
         const response = await getJsonTokenData("streams");
@@ -94,27 +102,50 @@ const resolvers = {
         console.log(error);
       }
     },
-    // getVideosByGame: async (_, { id }) => {
-    //   const response = await getJsonTokenData(`videos?game_id=${id}`);
-    //   return response.data;
-    // },
-    // getChannelInformation: async (_, { id }) => {
-    //   const response = await getJsonTokenData(`channels?broadcaster_id=${id}`);
-    //   return response.data;
-    // },
-    // getClipsByUserId: async (_, { id }) => {
-    //   const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
-    //   return response.data;
-    // },
-    // getInformationGameById: async (_, { id }) => {
-    //   const response = await getJsonTokenData(`games?id=${id}`);
-    //   return response.data;
-    // },
+    getVideosByGame: async (_, { id }) => {
+      const response = await getJsonTokenData(`videos?game_id=${id}`);
+      return response.data;
+    },
+    getChannelInformation: async (_, { id }) => {
+      const response = await getJsonTokenData(`channels?broadcaster_id=${id}`);
+      return response.data;
+    },
+    getClipsByUserId: async (_, { id }) => {
+      const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
+      return response.data;
+    },
+    getInformationGameById: async (_, { id }) => {
+      const response = await getJsonTokenData(`games?id=${id}`);
+      return response.data;
+    },
   },
   LiveStreams: {
     async videosByGame(video) {
-      const response = await getJsonTokenData(`videos?game_id=${video.game_id}`);
-      console.log(response.data)
+      const response = await getJsonTokenData(
+        `videos?game_id=${video.game_id}`
+      );
+      return response.data;
+    },
+  },
+  VideosByGame: {
+    async channelInformation(channel) {
+      const response = await getJsonTokenData(
+        `channels?broadcaster_id=${channel.user_id}`
+      );
+      return response.data;
+    },
+  },
+  ChannelInformation: {
+    async clipsByUser(clips) {
+      const response = await getJsonTokenData(
+        `clips?broadcaster_id=${clips.broadcaster_id}`
+      );
+      return response.data;
+    },
+  },
+  ClipsByUserId: {
+    async informationGame(game) {
+      const response = await getJsonTokenData(`games?id=${game.game_id}`);
       return response.data;
     },
   },

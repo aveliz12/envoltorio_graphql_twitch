@@ -40,6 +40,7 @@ type VideosByGame {
   type: String
   duration: String
   muted_segments: String
+  channelInformation: [ChannelInformation]
 }
 
 type ChannelInformation {
@@ -52,6 +53,7 @@ type ChannelInformation {
   title: String
   delay: Int
   tags: [String]
+  clipsByUser: [ClipsByUserId]
 }
 
 type ClipsByUserId {
@@ -71,6 +73,7 @@ type ClipsByUserId {
   thumbnail_url: String
   duration: Float
   vod_offset: String
+  informationGame: [InformationGameById]
 }
 
 type InformationGameById {
@@ -82,6 +85,7 @@ type InformationGameById {
 
 type Query {
   getToken: Token
+  getCasosPruebasLiveStreams: [LiveStreams]
   getLiveStreams: [LiveStreams]
   getVideosByGame(id: ID!): [VideosByGame]
   getChannelInformation(id: ID!): [ChannelInformation]
