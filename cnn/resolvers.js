@@ -86,38 +86,71 @@ const resolvers = {
         console.log(error);
       }
     },
-    getCasosPruebasLiveStreams: async () => {
+    getCasosPruebasLiveStreams: async (_, { first }) => {
       try {
-        const response = await getJsonTokenData("streams");
+        const dataStreams = [];
+
+        const response = await getJsonTokenData(`streams?first=${first}`);
+
+        dataStreams.push(...response.data);
+        console.log(dataStreams.length);
+
         return response.data;
       } catch (error) {
         console.log(error);
       }
     },
-    getLiveStreams: async () => {
+    getLiveStreams: async (_, { first }) => {
       try {
-        const response = await getJsonTokenData("streams");
-        return response.data;
+        const dataStreams = [];
+        //const params = new URLSearchParams();
+
+        const response = await getJsonTokenData(`streams?first=${first}`);
+
+        // params.append("after", response.pagination.cursor);
+
+        dataStreams.push(...response.data);
+        console.log(dataStreams.length);
+        return dataStreams;
+        
       } catch (error) {
         console.log(error);
       }
     },
-    getVideosByGame: async (_, { id }) => {
-      const response = await getJsonTokenData(`videos?game_id=${id}`);
-      return response.data;
-    },
-    getChannelInformation: async (_, { id }) => {
-      const response = await getJsonTokenData(`channels?broadcaster_id=${id}`);
-      return response.data;
-    },
-    getClipsByUserId: async (_, { id }) => {
-      const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
-      return response.data;
-    },
-    getInformationGameById: async (_, { id }) => {
-      const response = await getJsonTokenData(`games?id=${id}`);
-      return response.data;
-    },
+    // getVideosByGame: async (_, { id }) => {
+    //   try {
+    //     const response = await getJsonTokenData(`videos?game_id=${id}`);
+    //     return response.data;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
+    // getChannelInformation: async (_, { id }) => {
+    //   try {
+    //     const response = await getJsonTokenData(
+    //       `channels?broadcaster_id=${id}`
+    //     );
+    //     return response.data;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
+    // getClipsByUserId: async (_, { id }) => {
+    //   try {
+    //     const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
+    //     return response.data;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
+    // getInformationGameById: async (_, { id }) => {
+    //   try {
+    //     const response = await getJsonTokenData(`games?id=${id}`);
+    //     return response.data;
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
   },
   LiveStreams: {
     async videosByGame(video) {
