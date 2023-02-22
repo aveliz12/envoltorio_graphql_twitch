@@ -2,6 +2,7 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 const Storage = require("node-storage");
 const store = new Storage("./store");
+const { casoPruebaCache } = require("./Cache/withCache.js");
 
 const getJsonTokenData = async (path, params) => {
   const token = store.get("token");
@@ -16,55 +17,6 @@ const getJsonTokenData = async (path, params) => {
   return await response.json();
 };
 
-/*Métodos
-
-getLiveStreams: async () => {
-  try {
-    const response = await getJsonTokenData("streams");
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-},
-getVideosByGame: async () => {
-  const responseStreams = await getJsonTokenData("streams");
-  const game_id = responseStreams.data.map((id) => {
-    return id.game_id;
-  });
-  const params = new URLSearchParams();
-  params.append("game_id", game_id[0]);
-
-  try {
-    const resp = await getJsonTokenData(`videos?${params}`);
-    return resp.data;
-  } catch (error) {
-    console.log(error);
-  }
-},
-getChannelInformation: async () => {
-  const responseStreams = await getJsonTokenData("streams");
-  const game_id = responseStreams.data.map((id) => {
-    return id.game_id;
-  });
-
-  const resp = await getJsonTokenData(`videos?game_id=${game_id[0]}`);
-  const idChannel = resp.data.map((idCha) => {
-    return idCha.user_id;
-  });
-
-  console.log(idChannel)
-
-  const params = new URLSearchParams();
-  params.append("broadcaster_id", idChannel[0]);
-
-  try {
-    const channelInformation = await getJsonTokenData(`channels?${params}`);
-    return channelInformation.data;
-  } catch (error) {
-    console.log(error);
-  }
-},
-*/
 const resolvers = {
   Query: {
     getToken: async () => {
@@ -86,33 +38,51 @@ const resolvers = {
         console.log(error);
       }
     },
-    getCasosPruebasLiveStreams: async (_, { first }) => {
+    getCasosPruebasLiveStreams: async (_, { first = 20 }) => {
       try {
-        const dataStreams = [];
+        let dataStreams = [];
+        let cursor = null;
+        while (first > 0) {
+          const response = await getJsonTokenData(
+            `streams?first=${first > 100 ? 100 : first}${
+              cursor === null ? "" : `&after=${cursor}`
+            }`
+          );
+          x;
 
-        const response = await getJsonTokenData(`streams?first=${first}`);
-
-        dataStreams.push(...response.data);
+          first = first - response.data.length;
+          dataStreams = [...dataStreams, ...response.data];
+          cursor = response.pagination.cursor;
+        }
         console.log(dataStreams.length);
-
-        return response.data;
+        //return dataStreams;
       } catch (error) {
         console.log(error);
       }
     },
-    getLiveStreams: async (_, { first }) => {
+
+    getCasosPruebasCacheLiveStreams: async () => {
+      const data = await casoPruebaCache();
+      console.log(data);
+    },
+    getLiveStreams: async (_, { first = 20 }) => {
       try {
-        const dataStreams = [];
-        //const params = new URLSearchParams();
+        let dataStreams = [];
+        let cursor = null;
 
-        const response = await getJsonTokenData(`streams?first=${first}`);
+        while (first > 0) {
+          const response = await getJsonTokenData(
+            `streams?first=${first > 100 ? 100 : first}${
+              cursor === null ? "" : `&after=${cursor}`
+            }`
+          );
 
-        // params.append("after", response.pagination.cursor);
-
-        dataStreams.push(...response.data);
+          first = first - response.data.length;
+          dataStreams = [...dataStreams, ...response.data];
+          cursor = response.pagination.cursor;
+        }
         console.log(dataStreams.length);
         return dataStreams;
-        
       } catch (error) {
         console.log(error);
       }

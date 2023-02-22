@@ -18,6 +18,7 @@ type LiveStreams {
   language: String
   thumbnail_url: String
   tag_ids: [String]
+  tags: [String]
   is_mature: Boolean
   videosByGame: [VideosByGame]
 }
@@ -85,8 +86,9 @@ type InformationGameById {
 
 type Query {
   getToken: Token
-  getCasosPruebasLiveStreams(first:Int, after: String): [LiveStreams]
-  getLiveStreams(first:Int, after: String): [LiveStreams]
+  getCasosPruebasLiveStreams(first: Int): [LiveStreams]
+  getCasosPruebasCacheLiveStreams(first: Int): [LiveStreams]
+  getLiveStreams(first: Int, after: String): [LiveStreams]
   getVideosByGame(id: ID!): [VideosByGame]
   getChannelInformation(id: ID!): [ChannelInformation]
   getClipsByUserId(id: ID!): [ClipsByUserId]
