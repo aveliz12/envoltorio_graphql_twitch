@@ -41,19 +41,6 @@ type VideosByGame {
   type: String
   duration: String
   muted_segments: String
-  channelInformation: [ChannelInformation]
-}
-
-type ChannelInformation {
-  broadcaster_id: String
-  broadcaster_login: String
-  broadcaster_name: String
-  broadcaster_language: String
-  game_id: String
-  game_name: String
-  title: String
-  delay: Int
-  tags: [String]
   clipsByUser: [ClipsByUserId]
 }
 
@@ -74,6 +61,19 @@ type ClipsByUserId {
   thumbnail_url: String
   duration: Float
   vod_offset: String
+  channelInformation: [ChannelInformation]
+}
+
+type ChannelInformation {
+  broadcaster_id: String
+  broadcaster_login: String
+  broadcaster_name: String
+  broadcaster_language: String
+  game_id: String
+  game_name: String
+  title: String
+  delay: Int
+  tags: [String]
   informationGame: [InformationGameById]
 }
 
