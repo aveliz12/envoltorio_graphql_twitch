@@ -2,7 +2,6 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 const Storage = require("node-storage");
 const store = new Storage("./store");
-const { casoPruebaCache } = require("./Cache/withCache.js");
 
 const getJsonTokenData = async (path, params) => {
   const token = store.get("token");
@@ -48,7 +47,6 @@ const resolvers = {
               cursor === null ? "" : `&after=${cursor}`
             }`
           );
-          x;
 
           first = first - response.data.length;
           dataStreams = [...dataStreams, ...response.data];
@@ -59,11 +57,6 @@ const resolvers = {
       } catch (error) {
         console.log(error);
       }
-    },
-
-    getCasosPruebasCacheLiveStreams: async () => {
-      const data = await casoPruebaCache();
-      console.log(data);
     },
     getLiveStreams: async (_, { first = 20 }) => {
       try {
@@ -87,40 +80,40 @@ const resolvers = {
         console.log(error);
       }
     },
-    // getVideosByGame: async (_, { id }) => {
-    //   try {
-    //     const response = await getJsonTokenData(`videos?game_id=${id}`);
-    //     return response.data;
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    // getChannelInformation: async (_, { id }) => {
-    //   try {
-    //     const response = await getJsonTokenData(
-    //       `channels?broadcaster_id=${id}`
-    //     );
-    //     return response.data;
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    // getClipsByUserId: async (_, { id }) => {
-    //   try {
-    //     const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
-    //     return response.data;
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    // getInformationGameById: async (_, { id }) => {
-    //   try {
-    //     const response = await getJsonTokenData(`games?id=${id}`);
-    //     return response.data;
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
+    getVideosByGame: async (_, { id }) => {
+      try {
+        const response = await getJsonTokenData(`videos?game_id=${id}`);
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getChannelInformation: async (_, { id }) => {
+      try {
+        const response = await getJsonTokenData(
+          `channels?broadcaster_id=${id}`
+        );
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getClipsByUserId: async (_, { id }) => {
+      try {
+        const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getInformationGameById: async (_, { id }) => {
+      try {
+        const response = await getJsonTokenData(`games?id=${id}`);
+        return response.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
   LiveStreams: {
     async videosByGame(video) {

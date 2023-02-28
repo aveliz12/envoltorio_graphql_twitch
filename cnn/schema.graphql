@@ -87,7 +87,7 @@ type InformationGameById {
 type Query {
   getToken: Token
   getCasosPruebasLiveStreams(first: Int): [LiveStreams]
-  getCasosPruebasCacheLiveStreams(first: Int): [LiveStreams]
+  ##getCasosPruebasCacheLiveStreams(first: Int): [LiveStreams]
   getLiveStreams(first: Int, after: String): [LiveStreams]
   getVideosByGame(id: ID!): [VideosByGame]
   getChannelInformation(id: ID!): [ChannelInformation]
