@@ -124,24 +124,25 @@ const resolvers = {
     },
   },
   VideosByGame: {
-    async channelInformation(channel) {
-      const response = await getJsonTokenData(
-        `channels?broadcaster_id=${channel.user_id}`
-      );
-      return response.data;
-    },
-  },
-  ChannelInformation: {
     async clipsByUser(clips) {
       const response = await getJsonTokenData(
-        `clips?broadcaster_id=${clips.broadcaster_id}`
+        `clips?broadcaster_id=${clips.user_id}`
       );
       return response.data;
     },
   },
   ClipsByUserId: {
+    async channelInformation(channel) {
+      const response = await getJsonTokenData(
+        `channels?broadcaster_id=${channel.broadcaster_id}`
+      );
+      return response.data;
+    },
+  },
+  ChannelInformation: {
     async informationGame(game) {
       const response = await getJsonTokenData(`games?id=${game.game_id}`);
+
       return response.data;
     },
   },
