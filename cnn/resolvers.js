@@ -62,14 +62,27 @@ const resolvers = {
       try {
         let dataStreams = [];
         let cursor = null;
+        // let count = 0;
 
+        // var response = await getJsonTokenData(`streams`);
+        // cursor = response.pagination.cursor;
+
+        // while (cursor !== "") {
+        //   response = await getJsonTokenData(
+        //     `streams?first=${first}${cursor === null ? "" : `&after=${cursor}`}`
+        //   );
+        //   count++;
+        //   cursor = response.pagination.cursor;
+        //   dataStreams = [...dataStreams, ...response.data];
+        //   console.log("Número de Peticiones: ",count);
+        //   console.log("Número de Datos: ",dataStreams.length);
+        // }
         while (first > 0) {
           const response = await getJsonTokenData(
             `streams?first=${first > 100 ? 100 : first}${
               cursor === null ? "" : `&after=${cursor}`
             }`
           );
-
           first = first - response.data.length;
           dataStreams = [...dataStreams, ...response.data];
           cursor = response.pagination.cursor;
