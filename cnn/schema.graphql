@@ -20,7 +20,7 @@ type LiveStreams {
   tag_ids: [String]
   tags: [String]
   is_mature: Boolean
-  videosByGame: [VideosByGame]
+  videosByGame(first: Int): [VideosByGame]
 }
 
 type VideosByGame {
@@ -41,7 +41,7 @@ type VideosByGame {
   type: String
   duration: String
   muted_segments: String
-  clipsByUser: [ClipsByUserId]
+  clipsByUser(first: Int): [ClipsByUserId]
 }
 
 type ClipsByUserId {
@@ -61,7 +61,7 @@ type ClipsByUserId {
   thumbnail_url: String
   duration: Float
   vod_offset: String
-  channelInformation: [ChannelInformation]
+  channelInformation(first: Int): [ChannelInformation]
 }
 
 type ChannelInformation {
@@ -74,7 +74,7 @@ type ChannelInformation {
   title: String
   delay: Int
   tags: [String]
-  informationGame: [InformationGameById]
+  informationGame(first: Int): [InformationGameById]
 }
 
 type InformationGameById {
@@ -86,7 +86,13 @@ type InformationGameById {
 
 type Query {
   getToken: Token
-  getCasosPruebasLiveStreams(first: Int): [LiveStreams]
+  getCasosPruebasLiveStreams(
+    first: Int
+    first2: Int
+    first3: Int
+    first4: Int
+    first5: Int
+  ): [LiveStreams]
   ##getCasosPruebasCacheLiveStreams(first: Int): [LiveStreams]
   getLiveStreams(first: Int, after: String): [LiveStreams]
   getVideosByGame(id: ID!): [VideosByGame]

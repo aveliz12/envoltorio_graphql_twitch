@@ -114,34 +114,65 @@ const resolvers = {
     },
   },
   LiveStreams: {
-    async videosByGame(video) {
-      const response = await getJsonTokenData(
-        `videos?game_id=${video.game_id}`
-      );
-      return response.data;
+    async videosByGame(video, { first = 20 }) {
+      let dataVideos = [];
+      let cursor = null;
+      while (first > 0) {
+        const response = await getJsonTokenData(
+          `videos?game_id=${video.game_id}&first=${first > 50 ? 50 : first}${
+            cursor === null ? "" : `&after=${cursor}`
+          }`
+        );
+        first = first - response.data.length;
+        dataVideos = [...dataVideos, ...response.data];
+        cursor = response.pagination.cursor;
+      }
+      return dataVideos;
     },
   },
   VideosByGame: {
-    async clipsByUser(clips) {
-      const response = await getJsonTokenData(
-        `clips?broadcaster_id=${clips.user_id}`
-      );
-      return response.data;
+    async clipsByUser(clips, { first = 20 }) {
+      let dataClips = [];
+      let cursor = null;
+      while (first > 0) {
+        const response = await getJsonTokenData(
+          `clips?broadcaster_id=${clips.user_id}&first=${
+            first > 50 ? 50 : first
+          }${cursor === null ? "" : `&after=${cursor}`}`
+        );
+        first = first - response.data.length;
+        dataClips = [...dataClips, ...response.data];
+        cursor = response.pagination.cursor;
+      }
+      return dataClips;
     },
   },
   ClipsByUserId: {
-    async channelInformation(channel) {
-      const response = await getJsonTokenData(
-        `channels?broadcaster_id=${channel.broadcaster_id}`
-      );
-      return response.data;
+    async channelInformation(channel, { first = 20 }) {
+      let dataChannel = [];
+      while (first > 0) {
+        const response = await getJsonTokenData(
+          `channels?broadcaster_id=${channel.broadcaster_id}&first=${
+            first > 50 ? 50 : first
+          }`
+        );
+        first = first - response.data.length;
+        dataChannel = [...dataChannel, ...response.data];
+      }
+      return dataChannel;
     },
   },
   ChannelInformation: {
-    async informationGame(game) {
-      const response = await getJsonTokenData(`games?id=${game.game_id}`);
-
-      return response.data;
+    async informationGame(game, { first = 20 }) {
+      let dataGame = [];
+      while (first > 0) {
+        const response = await getJsonTokenData(
+          `games?id=${game.game_id}&first=${first > 50 ? 50 : first}`
+        );
+        first = first - response.data.length;
+        dataGame = [...dataGame, ...response.data];
+      }
+      return dataGame;
     },
   },
 };
