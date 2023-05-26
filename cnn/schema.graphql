@@ -95,8 +95,8 @@ type Query {
   ): [LiveStreams]
   ##getCasosPruebasCacheLiveStreams(first: Int): [LiveStreams]
   getLiveStreams(first: Int, after: String): [LiveStreams]
-  getVideosByGame(id: ID!): [VideosByGame]
-  getChannelInformation(id: ID!): [ChannelInformation]
-  getClipsByUserId(id: ID!): [ClipsByUserId]
-  getInformationGameById(id: ID!): [InformationGameById]
+  getVideosByGame(id: Int!, first: Int): [VideosByGame]
+  getChannelInformation(id: Int!): [ChannelInformation]
+  getClipsByUserId(id: Int!, first: Int): [ClipsByUserId]
+  getInformationGameById(id: Int!): [InformationGameById]
 }

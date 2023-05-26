@@ -2,7 +2,13 @@ const fetch = require("node-fetch");
 require("dotenv").config();
 const Storage = require("node-storage");
 const store = new Storage("./store");
-
+const {
+  getDataLiveStreams,
+  getDataVideosByGame,
+  getDataClipsByUser,
+  getDataInformationChannel,
+  getDataInformationGame,
+} = require("./service");
 const getJsonTokenData = async (path, params) => {
   const token = store.get("token");
   const response = await fetch(`https://api.twitch.tv/helix/${path}`, {
@@ -37,23 +43,28 @@ const resolvers = {
         console.log(error);
       }
     },
-    getCasosPruebasLiveStreams: async (_, { first = 20 }) => {
+    getCasosPruebasLiveStreams: async (_, { first }) => {
       try {
-        let dataStreams = [];
-        let cursor = null;
-        while (first > 0) {
-          const response = await getJsonTokenData(
-            `streams?first=${first > 50 ? 50 : first}${
-              cursor === null ? "" : `&after=${cursor}`
-            }`
-          );
+        const dataStreams = await getDataLiveStreams(first);
+        //console.log("Cantidad de datos: ", dataStreams.length);
+        // let dataStreams = [];
+        // let cursor = null;
+        // while (first > 0) {
+        //   const response = await getJsonTokenData(
+        //     `streams?first=${first > 50 ? 50 : first}${
+        //       cursor === null ? "" : `&after=${cursor}`
+        //     }`
+        //   );
 
-          first = first - response.data.length;
-          dataStreams = [...dataStreams, ...response.data];
-          cursor = response.pagination.cursor;
-        }
-        console.log(dataStreams.length);
-        return dataStreams;
+        //   first = first - response.data.length;
+        //   dataStreams = [...dataStreams, ...response.data];
+        //   cursor = response.pagination.cursor;
+        // }
+        return dataStreams.map((games) => {
+          return {
+            ...games,
+          };
+        });
       } catch (error) {
         console.log(error);
       }
@@ -78,101 +89,101 @@ const resolvers = {
         console.log(error);
       }
     },
-    getVideosByGame: async (_, { id }) => {
+    getVideosByGame: async (_, { id, first }) => {
       try {
-        const response = await getJsonTokenData(`videos?game_id=${id}`);
-        return response.data;
+        const dataVideos = await getDataVideosByGame(id, first);
+        return dataVideos;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getClipsByUserId: async (_, { id, first }) => {
+      try {
+        const dataClips = await getDataClipsByUser(id, first);
+        return dataClips;
       } catch (error) {
         console.log(error);
       }
     },
     getChannelInformation: async (_, { id }) => {
       try {
-        const response = await getJsonTokenData(
-          `channels?broadcaster_id=${id}`
-        );
-        return response.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    getClipsByUserId: async (_, { id }) => {
-      try {
-        const response = await getJsonTokenData(`clips?broadcaster_id=${id}`);
-        return response.data;
+        const dataChannel = await getDataInformationChannel(id);
+        return dataChannel;
       } catch (error) {
         console.log(error);
       }
     },
     getInformationGameById: async (_, { id }) => {
       try {
-        const response = await getJsonTokenData(`games?id=${id}`);
-        return response.data;
+        const dataGame = await getDataInformationGame(id);
+        return dataGame;
       } catch (error) {
         console.log(error);
       }
     },
   },
   LiveStreams: {
-    async videosByGame(video, { first = 20 }) {
-      let dataVideos = [];
-      let cursor = null;
-      while (first > 0) {
-        const response = await getJsonTokenData(
-          `videos?game_id=${video.game_id}&first=${first > 50 ? 50 : first}${
-            cursor === null ? "" : `&after=${cursor}`
-          }`
-        );
-        first = first - response.data.length;
-        dataVideos = [...dataVideos, ...response.data];
-        cursor = response.pagination.cursor;
-      }
+    async videosByGame(video, { first = 50 }) {
+      const dataVideos = await getDataVideosByGame(video.game_id, first);
       return dataVideos;
+      // let cursor = null;
+      // while (first > 0) {
+      //   const response = await getJsonTokenData(
+      //     `videos?game_id=${video.game_id}&first=${first > 50 ? 50 : first}${
+      //       cursor === null ? "" : `&after=${cursor}`
+      //     }`
+      //   );
+      //   first = first - response.data.length;
+      //   dataVideos = [...dataVideos, ...response.data];
+      //   cursor = response.pagination.cursor;
+      // }
     },
   },
   VideosByGame: {
-    async clipsByUser(clips, { first = 20 }) {
-      let dataClips = [];
-      let cursor = null;
-      while (first > 0) {
-        const response = await getJsonTokenData(
-          `clips?broadcaster_id=${clips.user_id}&first=${
-            first > 50 ? 50 : first
-          }${cursor === null ? "" : `&after=${cursor}`}`
-        );
-        first = first - response.data.length;
-        dataClips = [...dataClips, ...response.data];
-        cursor = response.pagination.cursor;
-      }
+    async clipsByUser(clips, { first = 50 }) {
+      const dataClips = await getDataClipsByUser(clips.user_id, first);
       return dataClips;
+      // let cursor = null;
+      // while (first > 0) {
+      //   const response = await getJsonTokenData(
+      //     `clips?broadcaster_id=${clips.user_id}&first=${
+      //       first > 50 ? 50 : first
+      //     }${cursor === null ? "" : `&after=${cursor}`}`
+      //   );
+      //   first = first - response.data.length;
+      //   dataClips = [...dataClips, ...response.data];
+      //   cursor = response.pagination.cursor;
+      // }
     },
   },
   ClipsByUserId: {
-    async channelInformation(channel, { first = 20 }) {
-      let dataChannel = [];
-      while (first > 0) {
-        const response = await getJsonTokenData(
-          `channels?broadcaster_id=${channel.broadcaster_id}&first=${
-            first > 50 ? 50 : first
-          }`
-        );
-        first = first - response.data.length;
-        dataChannel = [...dataChannel, ...response.data];
-      }
+    async channelInformation(channel) {
+      const dataChannel = await getDataInformationChannel(
+        channel.broadcaster_id
+      );
       return dataChannel;
+      // while (first > 0) {
+      //   const response = await getJsonTokenData(
+      //     `channels?broadcaster_id=${channel.broadcaster_id}&first=${
+      //       first > 50 ? 50 : first
+      //     }`
+      //   );
+      //   first = first - response.data.length;
+      //   dataChannel = [...dataChannel, ...response.data];
+      // }
     },
   },
   ChannelInformation: {
-    async informationGame(game, { first = 20 }) {
-      let dataGame = [];
-      while (first > 0) {
-        const response = await getJsonTokenData(
-          `games?id=${game.game_id}&first=${first > 50 ? 50 : first}`
-        );
-        first = first - response.data.length;
-        dataGame = [...dataGame, ...response.data];
-      }
+    async informationGame(game) {
+      const dataGame = await getDataInformationGame(game.game_id);
       return dataGame;
+      // while (first > 0) {
+      //   const response = await getJsonTokenData(
+      //     `games?id=${game.game_id}&first=${first > 50 ? 50 : first}`
+      //   );
+      //   first = first - response.data.length;
+      //   dataGame = [...dataGame, ...response.data];
+      // }
     },
   },
 };
