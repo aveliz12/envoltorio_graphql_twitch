@@ -13,24 +13,11 @@ const queryLiveStreams = gql`
   }
 `;
 
-// const queryVideosByGame = gql`
-//   query getVideosByGame($id: Int!, $limitNivel2: Int, $cursor: String) {
-//     videos(id: $id, first: $limitNivel2, after: $cursor)
-//       @rest(
-//         type: "videos"
-//         path: "videos?game_id={args.id}&first={args.first}{args.after}"
-//       ) {
-//       data
-//       pagination
-//     }
-//   }
-// `;
-
-const queryVideos= gql`
-  query getVideosByGame($id: Int!, $limitNivel2: Int, $cursor: String) {
-    videos(id: $id, first: $limitNivel2, after: $cursor)
+const queryVideos = gql`
+  query getVideosByGame($id: Int, $limitNivel2: Int, $cursor: String) {
+    videosByGame(id: $id, first: $limitNivel2, after: $cursor)
       @rest(
-        type: "videos"
+        type: "videosByGame"
         path: "videos?game_id={args.id}&first={args.first}{args.after}"
       ) {
       data

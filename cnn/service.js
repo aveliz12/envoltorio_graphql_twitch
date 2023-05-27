@@ -139,12 +139,11 @@ const getDataVideos = async (id, first) => {
     let cursor = null;
     let dataVideos = [];
     const token = store.get("token");
-
     //CONSULTA
     client.setLink(
       new RestLink({
-        bodySerializer: (body) => JSON.stringify(body),
         uri: "https://api.twitch.tv/helix/",
+        //customFetch: fetch,
         headers: {
           Authorization: "Bearer " + token,
           "Client-Id": process.env.CLIENTID,
@@ -161,18 +160,16 @@ const getDataVideos = async (id, first) => {
           cursor: cursor === null ? "" : `&after=${cursor}`,
         },
       });
-
-      const dataVideosByGame = response.data.videos;
+      const dataVideosByGame = response.data.videosByGame;
       console.log(dataVideosByGame);
-      // if (
-      //   dataClipsByUser?.data?.length > 0 ||
-      //   dataClipsByUser?.pagination?.length > 0
-      // ) {
-      first = first - dataVideosByGame.data.length;
-      dataVideos = [...dataVideos, ...dataVideosByGame.data];
-      if (dataVideosByGame.pagination.cursor !== undefined) {
+
+      if (
+        dataVideosByGame?.data?.length > 0 ||
+        dataVideosByGame?.pagination?.length > 0
+      ) {
+        first = first - dataVideosByGame.data.length;
+        dataVideos = [...dataVideos, ...dataVideosByGame.data];
         cursor = dataVideosByGame.pagination.cursor;
-        break;
       } else {
         break;
       }

@@ -92,7 +92,6 @@ const resolvers = {
     },
     getVideosByGame: async (_, { id, first }) => {
       try {
-        
         const dataVideos = await getDataVideos(id, first);
         return dataVideos;
       } catch (error) {
