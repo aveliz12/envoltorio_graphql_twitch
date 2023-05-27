@@ -88,7 +88,6 @@ const getDataVideosByGame = async (id, first) => {
     let cursor = null;
     let dataVideos = [];
     const token = store.get("token");
-    console.log("METODO DE VIDEOS ");
     //CONSULTA
     client.setLink(
       new RestLink({
@@ -102,7 +101,7 @@ const getDataVideosByGame = async (id, first) => {
     );
 
     while (first > 0) {
-      console.log("EMPEZANDO EL CONSUMO");
+      //console.log("EMPEZANDO EL CONSUMO");
       const response = await client.query({
         query: queryVideosByGame,
         variables: {
@@ -122,7 +121,6 @@ const getDataVideosByGame = async (id, first) => {
       if (dataVideosByGame.pagination.cursor !== undefined) {
         cursor = dataVideosByGame.pagination.cursor;
       } else {
-        console.log("NO HAY DATOS");
         break;
       }
       // } else {
