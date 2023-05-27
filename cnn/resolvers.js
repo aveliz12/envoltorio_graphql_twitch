@@ -4,7 +4,8 @@ const Storage = require("node-storage");
 const store = new Storage("./store");
 const {
   getDataLiveStreams,
-  getDataVideosByGame,
+  //getDataVideosByGame,
+  getDataVideos,
   getDataClipsByUser,
   getDataInformationChannel,
   getDataInformationGame,
@@ -91,7 +92,8 @@ const resolvers = {
     },
     getVideosByGame: async (_, { id, first }) => {
       try {
-        const dataVideos = await getDataVideosByGame(id, first);
+        
+        const dataVideos = await getDataVideos(id, first);
         return dataVideos;
       } catch (error) {
         console.log(error);
@@ -124,7 +126,7 @@ const resolvers = {
   },
   LiveStreams: {
     async videosByGame(video, { first = 50 }) {
-      const dataVideos = await getDataVideosByGame(video.game_id, first);
+      const dataVideos = await getDataVideos(video.game_id, first);
       return dataVideos;
       // let cursor = null;
       // while (first > 0) {

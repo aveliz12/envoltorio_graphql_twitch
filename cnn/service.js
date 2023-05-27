@@ -8,7 +8,7 @@ const {
 } = require("@apollo/client/core");
 const {
   queryLiveStreams,
-  queryVideosByGame,
+  queryVideos,
   queryClipsByUser,
   queryChannelInfo,
   queryGameInfo,
@@ -83,11 +83,63 @@ const getDataLiveStreams = async (first) => {
 };
 
 //Funcion para extraer VideosByGame
-const getDataVideosByGame = async (id, first) => {
+// const getDataVideosByGame = async (id, first) => {
+//   try {
+//     let cursor = null;
+//     let dataVideos = [];
+//     const token = store.get("token");
+//     //CONSULTA
+//     client.setLink(
+//       new RestLink({
+//         uri: "https://api.twitch.tv/helix/",
+//         headers: {
+//           Authorization: "Bearer " + token,
+//           "Client-Id": process.env.CLIENTID,
+//         },
+//       })
+//     );
+
+//     while (first > 0) {
+//       //console.log("EMPEZANDO EL CONSUMO");
+//       const response = await client.query({
+//         query: queryVideos,
+//         variables: {
+//           id,
+//           limitNivel2: first > 50 ? 50 : first,
+//           cursor: cursor === null ? "" : `&after=${cursor}`,
+//         },
+//       });
+//       const dataVideosByGame = response.data.videos;
+//       // if (
+//       //   dataClipsByUser?.data?.length > 0 ||
+//       //   dataClipsByUser?.pagination?.length > 0
+//       // ) {
+//       console.log(dataVideosByGame);
+//       first = first - dataVideosByGame.data.length;
+//       dataVideos = [...dataVideos, ...dataVideosByGame.data];
+//       if (dataVideosByGame.pagination.cursor !== undefined) {
+//         cursor = dataVideosByGame.pagination.cursor;
+//         break;
+//       } else {
+//         break;
+//       }
+//       // } else {
+//       //   break;
+//       // }
+//     }
+
+//     return dataVideos;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+const getDataVideos = async (id, first) => {
   try {
     let cursor = null;
     let dataVideos = [];
     const token = store.get("token");
+
     //CONSULTA
     client.setLink(
       new RestLink({
@@ -101,31 +153,29 @@ const getDataVideosByGame = async (id, first) => {
     );
 
     while (first > 0) {
-      //console.log("EMPEZANDO EL CONSUMO");
       const response = await client.query({
-        query: queryVideosByGame,
+        query: queryVideos,
         variables: {
           id,
           limitNivel2: first > 50 ? 50 : first,
           cursor: cursor === null ? "" : `&after=${cursor}`,
         },
       });
-      const dataVideosByGame = response.data.videosByGame;
+
+      const dataVideosByGame = response.data.videos;
+      console.log(dataVideosByGame);
       // if (
       //   dataClipsByUser?.data?.length > 0 ||
       //   dataClipsByUser?.pagination?.length > 0
       // ) {
-      console.log(dataVideosByGame);
       first = first - dataVideosByGame.data.length;
       dataVideos = [...dataVideos, ...dataVideosByGame.data];
       if (dataVideosByGame.pagination.cursor !== undefined) {
         cursor = dataVideosByGame.pagination.cursor;
+        break;
       } else {
         break;
       }
-      // } else {
-      //   break;
-      // }
     }
 
     return dataVideos;
@@ -162,6 +212,7 @@ const getDataClipsByUser = async (id, first) => {
           cursor: cursor === null ? "" : `&after=${cursor}`,
         },
       });
+
       const dataClipsByUser = response.data.clipsUser;
       // if (
       //   dataClipsByUser?.data?.length > 0 ||
@@ -258,7 +309,8 @@ const getDataInformationGame = async (id) => {
 
 module.exports = {
   getDataLiveStreams,
-  getDataVideosByGame,
+  //getDataVideosByGame,
+  getDataVideos,
   getDataClipsByUser,
   getDataInformationChannel,
   getDataInformationGame,

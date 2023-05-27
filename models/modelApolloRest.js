@@ -13,11 +13,24 @@ const queryLiveStreams = gql`
   }
 `;
 
-const queryVideosByGame = gql`
-  query getVideosByGame($id: Int, $limitNivel2: Int, $cursor: String) {
-    videosByGame(id: $id, first: $limitNivel2, after: $cursor) 
-    @rest(
-        type: "videosByGame"
+// const queryVideosByGame = gql`
+//   query getVideosByGame($id: Int!, $limitNivel2: Int, $cursor: String) {
+//     videos(id: $id, first: $limitNivel2, after: $cursor)
+//       @rest(
+//         type: "videos"
+//         path: "videos?game_id={args.id}&first={args.first}{args.after}"
+//       ) {
+//       data
+//       pagination
+//     }
+//   }
+// `;
+
+const queryVideos= gql`
+  query getVideosByGame($id: Int!, $limitNivel2: Int, $cursor: String) {
+    videos(id: $id, first: $limitNivel2, after: $cursor)
+      @rest(
+        type: "videos"
         path: "videos?game_id={args.id}&first={args.first}{args.after}"
       ) {
       data
@@ -27,7 +40,7 @@ const queryVideosByGame = gql`
 `;
 
 const queryClipsByUser = gql`
-  query getClipsByUser($id: Int, $limitNivel3: Int, $cursor: String) {
+  query getClipsByUser($id: Int!, $limitNivel3: Int, $cursor: String) {
     clipsUser(id: $id, first: $limitNivel3, after: $cursor)
       @rest(
         type: "clipsUser"
@@ -40,7 +53,7 @@ const queryClipsByUser = gql`
 `;
 
 const queryChannelInfo = gql`
-  query getChannelInformation($id: Int) {
+  query getChannelInformation($id: Int!) {
     channelInfo(id: $id)
       @rest(type: "channelInfo", path: "channels?broadcaster_id={args.id}") {
       data
@@ -49,7 +62,7 @@ const queryChannelInfo = gql`
 `;
 
 const queryGameInfo = gql`
-  query getGameInformation($id: Int) {
+  query getGameInformation($id: Int!) {
     gameInfo(id: $id) @rest(type: "gameInfo", path: "games?id={args.id}") {
       data
     }
@@ -58,7 +71,7 @@ const queryGameInfo = gql`
 
 module.exports = {
   queryLiveStreams,
-  queryVideosByGame,
+  queryVideos,
   queryClipsByUser,
   queryChannelInfo,
   queryGameInfo,
