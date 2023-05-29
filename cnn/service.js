@@ -82,8 +82,7 @@ const getDataLiveStreams = async (first) => {
   }
 };
 
-//Funcion para extraer VideosByGame
-// const getDataVideosByGame = async (id, first) => {
+// const getDataVideos = async (id, first) => {
 //   try {
 //     let cursor = null;
 //     let dataVideos = [];
@@ -92,6 +91,7 @@ const getDataLiveStreams = async (first) => {
 //     client.setLink(
 //       new RestLink({
 //         uri: "https://api.twitch.tv/helix/",
+//         //customFetch: fetch,
 //         headers: {
 //           Authorization: "Bearer " + token,
 //           "Client-Id": process.env.CLIENTID,
@@ -100,7 +100,6 @@ const getDataLiveStreams = async (first) => {
 //     );
 
 //     while (first > 0) {
-//       //console.log("EMPEZANDO EL CONSUMO");
 //       const response = await client.query({
 //         query: queryVideos,
 //         variables: {
@@ -109,23 +108,19 @@ const getDataLiveStreams = async (first) => {
 //           cursor: cursor === null ? "" : `&after=${cursor}`,
 //         },
 //       });
-//       const dataVideosByGame = response.data.videos;
-//       // if (
-//       //   dataClipsByUser?.data?.length > 0 ||
-//       //   dataClipsByUser?.pagination?.length > 0
-//       // ) {
+//       const dataVideosByGame = response.data.videosByGame;
 //       console.log(dataVideosByGame);
-//       first = first - dataVideosByGame.data.length;
-//       dataVideos = [...dataVideos, ...dataVideosByGame.data];
-//       if (dataVideosByGame.pagination.cursor !== undefined) {
+
+//       if (
+//         dataVideosByGame?.data?.length > 0 ||
+//         dataVideosByGame?.pagination?.length > 0
+//       ) {
+//         first = first - dataVideosByGame.data.length;
+//         dataVideos = [...dataVideos, ...dataVideosByGame.data];
 //         cursor = dataVideosByGame.pagination.cursor;
-//         break;
 //       } else {
 //         break;
 //       }
-//       // } else {
-//       //   break;
-//       // }
 //     }
 
 //     return dataVideos;
@@ -133,53 +128,6 @@ const getDataLiveStreams = async (first) => {
 //     console.log(error);
 //   }
 // };
-
-const getDataVideos = async (id, first) => {
-  try {
-    let cursor = null;
-    let dataVideos = [];
-    const token = store.get("token");
-    //CONSULTA
-    client.setLink(
-      new RestLink({
-        uri: "https://api.twitch.tv/helix/",
-        //customFetch: fetch,
-        headers: {
-          Authorization: "Bearer " + token,
-          "Client-Id": process.env.CLIENTID,
-        },
-      })
-    );
-
-    while (first > 0) {
-      const response = await client.query({
-        query: queryVideos,
-        variables: {
-          id,
-          limitNivel2: first > 50 ? 50 : first,
-          cursor: cursor === null ? "" : `&after=${cursor}`,
-        },
-      });
-      const dataVideosByGame = response.data.videosByGame;
-      console.log(dataVideosByGame);
-
-      if (
-        dataVideosByGame?.data?.length > 0 ||
-        dataVideosByGame?.pagination?.length > 0
-      ) {
-        first = first - dataVideosByGame.data.length;
-        dataVideos = [...dataVideos, ...dataVideosByGame.data];
-        cursor = dataVideosByGame.pagination.cursor;
-      } else {
-        break;
-      }
-    }
-
-    return dataVideos;
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 //Funcion para extraer clips por usuario
 const getDataClipsByUser = async (id, first) => {
@@ -211,18 +159,18 @@ const getDataClipsByUser = async (id, first) => {
       });
 
       const dataClipsByUser = response.data.clipsUser;
-      // if (
-      //   dataClipsByUser?.data?.length > 0 ||
-      //   dataClipsByUser?.pagination?.length > 0
-      // ) {
-      first = first - dataClipsByUser.data.length;
-      dataClips = [...dataClips, ...dataClipsByUser.data];
-      //if (dataClipsByUser.pagination.cursor !== undefined) {
-      cursor = dataClipsByUser.pagination.cursor;
-      //}
-      // } else {
-      //   break;
-      // }
+      if (
+        dataClipsByUser?.data?.length > 0 ||
+        dataClipsByUser?.pagination?.length > 0
+      ) {
+        first = first - dataClipsByUser.data.length;
+        dataClips = [...dataClips, ...dataClipsByUser.data];
+        if (dataClipsByUser.pagination.cursor !== undefined) {
+          cursor = dataClipsByUser.pagination.cursor;
+        }
+      } else {
+        break;
+      }
     }
 
     return dataClips;
@@ -306,8 +254,7 @@ const getDataInformationGame = async (id) => {
 
 module.exports = {
   getDataLiveStreams,
-  //getDataVideosByGame,
-  getDataVideos,
+  //getDataVideos,
   getDataClipsByUser,
   getDataInformationChannel,
   getDataInformationGame,
