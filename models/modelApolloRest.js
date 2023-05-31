@@ -2,10 +2,10 @@ const { gql } = require("@apollo/client/core");
 
 const queryLiveStreams = gql`
   query getLiveStreams($limitNivel1: Int, $cursor: String) {
-    liveStreams(first: $limitNivel1, after: $cursor)
+    liveStreams(limitNivel1: $limitNivel1, after: $cursor)
       @rest(
         type: "liveStreams"
-        path: "streams?first={args.first}{args.after}"
+        path: "streams?first={args.limitNivel1}{args.after}"
       ) {
       data
       pagination
@@ -15,10 +15,10 @@ const queryLiveStreams = gql`
 
 const queryVideos = gql`
   query getVideosByGame($id: Int, $limitNivel2: Int, $cursor: String) {
-    videosByGame(id: $id, first: $limitNivel2, after: $cursor)
+    videosByGame(id: $id, limitNivel2: $limitNivel2, after: $cursor)
       @rest(
         type: "videosByGame"
-        path: "videos?game_id={args.id}&first={args.first}{args.after}"
+        path: "videos?game_id={args.id}&first={args.limitNivel2}{args.after}"
       ) {
       data
       pagination
@@ -28,10 +28,10 @@ const queryVideos = gql`
 
 const queryClipsByUser = gql`
   query getClipsByUser($id: Int!, $limitNivel3: Int, $cursor: String) {
-    clipsUser(id: $id, first: $limitNivel3, after: $cursor)
+    clipsUser(id: $id, limitNivel3: $limitNivel3, after: $cursor)
       @rest(
         type: "clipsUser"
-        path: "clips?broadcaster_id={args.id}&first={args.first}{args.after}"
+        path: "clips?broadcaster_id={args.id}&first={args.limitNivel3}{args.after}"
       ) {
       data
       pagination

@@ -4,49 +4,12 @@ const Storage = require("node-storage");
 const store = new Storage("./store");
 const {
   getDataLiveStreams,
+  getDataVideos,
   getDataClipsByUser,
   getDataInformationChannel,
   getDataInformationGame,
 } = require("./service");
-/*----------------------------------CONSULTA----------------------------------------*/
-const getJsonTokenData = async (path, params) => {
-  const token = store.get("token");
-  const response = await fetch(`https://api.twitch.tv/helix/${path}`, {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + token,
-      "Client-Id": "a2bf4j1rhkytvzoc4ortzn7m4yxg33",
-    },
-    body: params,
-  });
-  return await response.json();
-};
-
-const getDataVideos = async (id, first) => {
-  try {
-    let dataVideos = [];
-    let cursor = null;
-    while (first > 0) {
-      const response = await getJsonTokenData(
-        `videos?game_id=${id}&first=${first > 50 ? 50 : first}${
-          cursor === null ? "" : `&after=${cursor}`
-        }`
-      );
-      if (response?.data?.length > 0 || response?.pagination?.length > 0) {
-        first = first - response.data.length;
-        dataVideos = [...dataVideos, ...response.data];
-        cursor = response.pagination.cursor;
-      } else {
-        break;
-      }
-    }
-
-    return dataVideos;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
+/*----------------------------------CONSULTA GRAPHQL----------------------------------------*/
 /*------------------------------------------------------------------------------------*/
 const resolvers = {
   Query: {
@@ -69,33 +32,42 @@ const resolvers = {
         console.log(error);
       }
     },
-    getCasosPruebasLiveStreams: async (_, { first }) => {
+    getCasosPruebasLiveStreams: async (_, { limitNivel1 = 50 }) => {
       try {
-        let dataVideosForCaso2 = [];
-        let totalDataVideos = 0;
-        let response;
-        do {
-          const data = await getDataLiveStreams(first);
-          const idGame = data.filter((resp) => resp.game_id);
-          for (const iDs of idGame) {
-            response = await getDataVideos(iDs.game_id, first);
-            if (response?.length >= first && response?.length > 0) {
-              dataVideosForCaso2.push(iDs);
-              totalDataVideos++;
-            }
-
-            if (totalDataVideos >= first) {
-              break;
-            }
-          }
-          if (totalDataVideos > first) {
-            //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
-            dataVideosForCaso2 = dataVideosForCaso2.slice(0, first);
-            totalDataVideos = first;
-            break;
-          }
-        } while (totalDataVideos === first);
-        return dataVideosForCaso2;
+        // console.log(limitNivel1,limitNivel2)
+        // if (limitNivel2 === undefined) {
+        //  console.log("SOLO NIVEL 1")
+        const data = await getDataLiveStreams(limitNivel1);
+        return data;
+        // } else {
+        //   console.log("YA CON NIVEL 2 ", limitNivel2)
+        //   let dataVideosForCaso2 = [];
+        //   let totalDataVideos = 0;
+        //   let response;
+        //   do {
+        //     const data = await getDataLiveStreams(limitNivel1);
+        //     const idGame = data.filter((resp) => resp.game_id);
+        //     for (const iDs of idGame) {
+        //       if (iDs !== null) {
+        //         response = await getDataVideos(iDs.game_id, limitNivel2);
+        //       }
+        //       if (response?.length >= limitNivel2 && response?.length > 0) {
+        //         dataVideosForCaso2.push(iDs);
+        //         totalDataVideos++;
+        //       }
+        //       if (totalDataVideos >= limitNivel1) {
+        //         break;
+        //       }
+        //     }
+        //     if (totalDataVideos > limitNivel1) {
+        //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
+        //       dataVideosForCaso2 = dataVideosForCaso2.slice(0, limitNivel1);
+        //       totalDataVideos = limitNivel1;
+        //       break;
+        //     }
+        //   } while (totalDataVideos === limitNivel1);
+        //   return dataVideosForCaso2;
+        // }
       } catch (error) {
         console.log(error);
       }
@@ -170,42 +142,72 @@ const resolvers = {
     },
   },
   LiveStreams: {
-    async videosByGame(video, { first = 50 }) {
+    async videosByGame(video, { limitNivel2 = 50 }) {
       try {
-        let dataVideosForCaso3 = [];
+        let dataVideosCaso2 = [];
         let totalDataVideos = 0;
-        let response;
         do {
-          const dataVideos = await getDataVideos(video.game_id, first);
-          const idUser = dataVideos.filter((resp) => resp.user_id);
-          for (const iDs of idUser) {
-            response = await getDataClipsByUser(iDs.user_id, first);
-            if (response?.length >= first && response?.length > 0) {
-              dataVideosForCaso3.push(iDs);
+          const response = await getDataVideos(video.game_id, limitNivel2);
+          if (response.length >= limitNivel2 && response.length > 0) {
+            for (const data of response) {
+              dataVideosCaso2.push(data);
               totalDataVideos++;
             }
-
-            if (totalDataVideos >= first) {
-              break;
-            }
           }
-          if (totalDataVideos > first) {
-            //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
-            dataVideosForCaso3 = dataVideosForCaso3.slice(0, first);
-            totalDataVideos = first;
+          if (totalDataVideos > limitNivel2) {
+            dataVideosCaso2 = dataVideosCaso2.slice(0, limitNivel2);
+            totalDataVideos = limitNivel2;
             break;
           }
-        } while (totalDataVideos === first);
-        return dataVideosForCaso3;
+        } while (totalDataVideos < limitNivel2);
+        return dataVideosCaso2;
       } catch (error) {
         console.log(error);
       }
     },
   },
   VideosByGame: {
-    async clipsByUser(clips, { first = 50 }) {
-      const dataClips = await getDataClipsByUser(clips.user_id, first);
-      return dataClips;
+    async clipsByUser(clips, { limitNivel3 = 50 }) {
+      let dataVideosCaso3 = [];
+      let totalDataClips = 0;
+      do {
+        const response = await getDataClipsByUser(clips.user_id, limitNivel3);
+        if (response.length > 0 && response.length >= limitNivel3) {
+          for (const dataClips of response) {
+            dataVideosCaso3.push(dataClips);
+            totalDataClips += response.length;
+          }
+        }
+        if (totalDataClips > limitNivel3) {
+          //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
+          dataVideosCaso3 = dataVideosCaso3.slice(0, limitNivel3);
+          totalDataClips = limitNivel3;
+          break;
+        }
+      } while (totalDataClips < limitNivel3);
+      return dataVideosCaso3;
+      // const idUser = dataVideos.filter((resp) => resp.user_id);
+      // for (const iDs of idUser) {
+      //   response = await getDataClipsByUser(iDs.user_id, limitNivel2);
+      //   if (response?.length >= limitNivel2 && response?.length > 0) {
+      //     dataVideosForCaso3.push(iDs);
+      //     totalDataVideos++;
+      //   }
+
+      //   if (totalDataVideos >= limitNivel2) {
+      //     break;
+      //   }
+      // }
+      // if (totalDataVideos > limitNivel2) {
+      //   //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
+      //   dataVideosForCaso3 = dataVideosForCaso3.slice(0, limitNivel2);
+      //   totalDataVideos = limitNivel2;
+      //   break;
+      // }
+      //} while (totalDataVideos === limitNivel2);
+      //return dataVideosForCaso3;
+      //const dataClips = await getDataClipsByUser(clips.user_id, limitNivel3);
+      //return dataClips;
       // let cursor = null;
       // while (first > 0) {
       //   const response = await getJsonTokenData(

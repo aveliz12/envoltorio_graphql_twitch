@@ -8,7 +8,6 @@ const {
 } = require("@apollo/client/core");
 const {
   queryLiveStreams,
-  queryVideos,
   queryClipsByUser,
   queryChannelInfo,
   queryGameInfo,
@@ -43,6 +42,20 @@ const client = new ApolloClient({
 });
 
 /*--------------------------------------------------Peticiones --------------------------------- */
+const getJsonTokenData = async (path, params) => {
+  const token = store.get("token");
+  const response = await axios.get(`https://api.twitch.tv/helix/${path}`, {
+    //method: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+      "Client-Id": process.env.CLIENTID,
+    },
+    timeout: 7200000,
+    body: params,
+  });
+  return response.data;
+  //return await response.json();
+};
 
 //Funcion obtener LiveStreams
 const getDataLiveStreams = async (first) => {
@@ -68,6 +81,7 @@ const getDataLiveStreams = async (first) => {
         query: queryLiveStreams,
         variables: {
           limitNivel1: first > 50 ? 50 : first,
+          limitNivel2: first > 50 ? 50 : first,
           cursor: cursor === null ? "" : `&after=${cursor}`,
         },
       });
@@ -77,6 +91,30 @@ const getDataLiveStreams = async (first) => {
       cursor = response.data.liveStreams.pagination.cursor;
     }
     return dataStreams;
+  } catch (error) {
+    console.log(error);
+  }
+};
+const getDataVideos = async (id, first) => {
+  try {
+    let dataVideos = [];
+    let cursor = null;
+    while (first > 0) {
+      const response = await getJsonTokenData(
+        `videos?game_id=${id}&first=${first > 50 ? 50 : first}${
+          cursor === null ? "" : `&after=${cursor}`
+        }`
+      );
+      if (response?.data?.length > 0 || response?.pagination?.length > 0) {
+        first = first - response.data.length;
+        dataVideos = [...dataVideos, ...response.data];
+        cursor = response.pagination.cursor;
+      } else {
+        break;
+      }
+    }
+
+    return dataVideos;
   } catch (error) {
     console.log(error);
   }
@@ -254,7 +292,7 @@ const getDataInformationGame = async (id) => {
 
 module.exports = {
   getDataLiveStreams,
-  //getDataVideos,
+  getDataVideos,
   getDataClipsByUser,
   getDataInformationChannel,
   getDataInformationGame,
