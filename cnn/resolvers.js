@@ -87,10 +87,10 @@ const resolvers = {
         let dataVideosCaso2 = [];
         let totalDataVideos = 0;
         do {
-          if (!video.game_id) {
-            break; // Detener el bucle si gameId es vacío
+          if (video.game_id.trim() === "") {
+            console.log("ID vacío encontrado. Saltando consulta de videos...");
+            continue;
           }
-          console.log("SE CONSULTA CON EL ID: ", video.game_id);
           const response = await getDataVideos(video.game_id, limitNivel2);
           if (response.length >= limitNivel2 && response.length > 0) {
             for (const data of response) {

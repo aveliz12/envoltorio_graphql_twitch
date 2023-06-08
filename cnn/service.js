@@ -86,10 +86,9 @@ const getDataLiveStreams = async (first) => {
 
       first = first - response.data.liveStreams.data.length;
       dataStreams = [...dataStreams, ...response.data.liveStreams.data];
-      if (response.data.liveStreams.pagination.cursor !== null) {
+      if (response.data.liveStreams.pagination.cursor !== "") {
         cursor = response.data.liveStreams.pagination.cursor;
       } else {
-        console.log("Ya no existen mas datos.");
         break;
       }
     }
@@ -108,10 +107,17 @@ const getDataVideos = async (id, first) => {
           cursor === null ? "" : `&after=${cursor}`
         }`
       );
-      if (response.data?.length > 0 || response.pagination?.length > 0) {
+      if (response.data.length > 0) {
         first = first - response.data.length;
         dataVideos = [...dataVideos, ...response.data];
-        cursor = response.pagination.cursor;
+        if (
+          response.pagination.length > 0 ||
+          response.pagination.cursor !== undefined
+        ) {
+          cursor = response.pagination.cursor;
+        } else {
+          break;
+        }
       } else {
         break;
       }
@@ -133,7 +139,7 @@ const getDataClipsByUser = async (id, first) => {
     //CONSULTA
     client.setLink(
       new RestLink({
-        //bodySerializer: (body) => JSON.stringify(body),
+        bodySerializer: (body) => JSON.stringify(body),
         uri: "https://api.twitch.tv/helix/",
         headers: {
           Authorization: "Bearer " + token,
@@ -166,6 +172,9 @@ const getDataClipsByUser = async (id, first) => {
         }
       } else {
         break;
+      }
+      if (first === 0) {
+        break; // Se han obtenido todos los datos requeridos, salir del bucle
       }
     }
 
