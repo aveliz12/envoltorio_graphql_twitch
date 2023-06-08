@@ -42,19 +42,17 @@ const client = new ApolloClient({
 });
 
 /*--------------------------------------------------Peticiones --------------------------------- */
-const getJsonTokenData = async (path, params) => {
+const getJsonTokenData = async (path) => {
   const token = store.get("token");
   const response = await axios.get(`https://api.twitch.tv/helix/${path}`, {
     //method: "GET",
     headers: {
       Authorization: "Bearer " + token,
-      "Client-Id": process.env.CLIENTID,
+      "Client-Id": "jknt4r853wgvdy5sph9ld34dico3rh",
     },
     timeout: 7200000,
-    body: params,
   });
   return response.data;
-  //return await response.json();
 };
 
 //Funcion obtener LiveStreams
@@ -66,7 +64,7 @@ const getDataLiveStreams = async (first) => {
 
     client.setLink(
       new RestLink({
-        bodySerializer: (body) => JSON.stringify(body),
+        //bodySerializer: (body) => JSON.stringify(body),
         uri: "https://api.twitch.tv/helix/",
         //customFetch: fetch,
         headers: {
@@ -88,7 +86,12 @@ const getDataLiveStreams = async (first) => {
 
       first = first - response.data.liveStreams.data.length;
       dataStreams = [...dataStreams, ...response.data.liveStreams.data];
-      cursor = response.data.liveStreams.pagination.cursor;
+      if (response.data.liveStreams.pagination.cursor !== null) {
+        cursor = response.data.liveStreams.pagination.cursor;
+      } else {
+        console.log("Ya no existen mas datos.");
+        break;
+      }
     }
     return dataStreams;
   } catch (error) {
@@ -105,7 +108,7 @@ const getDataVideos = async (id, first) => {
           cursor === null ? "" : `&after=${cursor}`
         }`
       );
-      if (response?.data?.length > 0 || response?.pagination?.length > 0) {
+      if (response.data?.length > 0 || response.pagination?.length > 0) {
         first = first - response.data.length;
         dataVideos = [...dataVideos, ...response.data];
         cursor = response.pagination.cursor;
@@ -120,53 +123,6 @@ const getDataVideos = async (id, first) => {
   }
 };
 
-// const getDataVideos = async (id, first) => {
-//   try {
-//     let cursor = null;
-//     let dataVideos = [];
-//     const token = store.get("token");
-//     //CONSULTA
-//     client.setLink(
-//       new RestLink({
-//         uri: "https://api.twitch.tv/helix/",
-//         //customFetch: fetch,
-//         headers: {
-//           Authorization: "Bearer " + token,
-//           "Client-Id": process.env.CLIENTID,
-//         },
-//       })
-//     );
-
-//     while (first > 0) {
-//       const response = await client.query({
-//         query: queryVideos,
-//         variables: {
-//           id,
-//           limitNivel2: first > 50 ? 50 : first,
-//           cursor: cursor === null ? "" : `&after=${cursor}`,
-//         },
-//       });
-//       const dataVideosByGame = response.data.videosByGame;
-//       console.log(dataVideosByGame);
-
-//       if (
-//         dataVideosByGame?.data?.length > 0 ||
-//         dataVideosByGame?.pagination?.length > 0
-//       ) {
-//         first = first - dataVideosByGame.data.length;
-//         dataVideos = [...dataVideos, ...dataVideosByGame.data];
-//         cursor = dataVideosByGame.pagination.cursor;
-//       } else {
-//         break;
-//       }
-//     }
-
-//     return dataVideos;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
 //Funcion para extraer clips por usuario
 const getDataClipsByUser = async (id, first) => {
   try {
@@ -177,7 +133,7 @@ const getDataClipsByUser = async (id, first) => {
     //CONSULTA
     client.setLink(
       new RestLink({
-        bodySerializer: (body) => JSON.stringify(body),
+        //bodySerializer: (body) => JSON.stringify(body),
         uri: "https://api.twitch.tv/helix/",
         headers: {
           Authorization: "Bearer " + token,
@@ -197,14 +153,16 @@ const getDataClipsByUser = async (id, first) => {
       });
 
       const dataClipsByUser = response.data.clipsUser;
-      if (
-        dataClipsByUser?.data?.length > 0 ||
-        dataClipsByUser?.pagination?.length > 0
-      ) {
+      if (dataClipsByUser.data.length > 0) {
         first = first - dataClipsByUser.data.length;
         dataClips = [...dataClips, ...dataClipsByUser.data];
-        if (dataClipsByUser.pagination.cursor !== undefined) {
+        if (
+          dataClipsByUser.pagination.length > 0 ||
+          dataClipsByUser.pagination.cursor !== undefined
+        ) {
           cursor = dataClipsByUser.pagination.cursor;
+        } else {
+          break;
         }
       } else {
         break;
@@ -221,7 +179,6 @@ const getDataClipsByUser = async (id, first) => {
 const getDataInformationChannel = async (id) => {
   try {
     const token = store.get("token");
-    // let cursor = null;
     let dataChannel = [];
 
     //CONSULTA
@@ -244,9 +201,7 @@ const getDataInformationChannel = async (id) => {
     });
     const dataInformationChannel = response.data.channelInfo;
 
-    //first = first - dataInformationChannel.data.length;
     dataChannel = [...dataChannel, ...dataInformationChannel.data];
-    // cursor = dataInformationChannel.pagination.cursor;
 
     return dataChannel;
   } catch (error) {
@@ -258,7 +213,6 @@ const getDataInformationChannel = async (id) => {
 const getDataInformationGame = async (id) => {
   try {
     const token = store.get("token");
-    // let cursor = null;
     let dataGames = [];
 
     //CONSULTAS
@@ -280,9 +234,7 @@ const getDataInformationGame = async (id) => {
     });
     const dataInformationGame = response.data.gameInfo;
 
-    //first = first - dataInformationGame.data.length;
     dataGames = [...dataGames, ...dataInformationGame.data];
-    // cursor = dataInformationGame.pagination.cursor;
 
     return dataGames;
   } catch (error) {
