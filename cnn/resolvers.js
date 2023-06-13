@@ -84,33 +84,48 @@ const resolvers = {
   LiveStreams: {
     async videosByGame(video, { limitNivel2 = 50 }) {
       try {
-        let dataVideosCaso2 = [];
-        let totalDataVideos = 0;
-        do {
-          if (video.game_id.trim() === "") {
+        let response;
+        const dataVideo = [];
+        dataVideo.push(video);
+        for (const idVideo of dataVideo) {
+          if (idVideo.game_id.trim() === "") {
             console.log("ID vacío encontrado. Saltando consulta de videos...");
             continue;
           }
-          const response = await getDataVideos(video.game_id, limitNivel2);
-          if (response.length >= limitNivel2 && response.length > 0) {
-            for (const data of response) {
-              dataVideosCaso2.push(data);
-              totalDataVideos++;
-            }
-          }
-          if (dataVideosCaso2.length < limitNivel2) {
-            // Realizar una nueva consulta con un nuevo gameId
-            console.log(
-              "CONSULTA INCOMPLETA. SE REALIZARÁ UNA NUEVA CONSULTA."
-            );
-            break;
-          }
-        } while (totalDataVideos < limitNivel2);
-        if (totalDataVideos > limitNivel2) {
-          dataVideosCaso2 = dataVideosCaso2.slice(0, limitNivel2);
-          totalDataVideos = limitNivel2;
+          response = await getDataVideos(idVideo.game_id, limitNivel2);
+          //if (response.length >= limitNivel2) {
+          //idCount++;
+          const eficiencia = (response.length * 100) / limitNivel2;
+          //}
+          console.log(
+            `LA EFICIENCIA DE VIDEOS CON EL ID ${idVideo.game_id} ES: ${eficiencia}%.`
+          );
         }
-        return dataVideosCaso2;
+        // do {
+        //   if (video.game_id.trim() === "") {
+        //     console.log("ID vacío encontrado. Saltando consulta de videos...");
+        //     continue;
+        //   }
+        //   const response = await getDataVideos(video.game_id, limitNivel2);
+        //   if (response.length >= limitNivel2 && response.length > 0) {
+        //     for (const data of response) {
+        //       dataVideosCaso2.push(data);
+        //       totalDataVideos++;
+        //     }
+        //   }
+        //   if (dataVideosCaso2.length < limitNivel2) {
+        //     // Realizar una nueva consulta con un nuevo gameId
+        //     console.log(
+        //       "CONSULTA INCOMPLETA. SE REALIZARÁ UNA NUEVA CONSULTA."
+        //     );
+        //     break;
+        //   }
+        // } while (totalDataVideos < limitNivel2);
+        // if (totalDataVideos > limitNivel2) {
+        //   dataVideosCaso2 = dataVideosCaso2.slice(0, limitNivel2);
+        //   totalDataVideos = limitNivel2;
+        // }
+        return response;
       } catch (error) {
         console.log(error);
       }
@@ -119,28 +134,40 @@ const resolvers = {
   VideosByGame: {
     async clipsByUser(clips, { limitNivel3 = 50 }) {
       let dataVideosCaso3 = [];
-      let totalDataClips = 0;
-      do {
-        console.log("SE CONSULTA CON EL ID DE USUARIO: ", clips.user_id);
-        const response = await getDataClipsByUser(clips.user_id, limitNivel3);
-        if (response.length > 0 && response.length >= limitNivel3) {
-          for (const dataClips of response) {
-            dataVideosCaso3.push(dataClips);
-            totalDataClips += response.length;
-          }
+      dataVideosCaso3.push(clips);
+      for (const idClip of dataVideosCaso3) {
+        if (idClip.user_id.trim() === "") {
+          console.log("ID vacío encontrado. Saltando consulta de videos...");
+          continue;
         }
-        if (dataVideosCaso3.length < limitNivel3) {
-          // Realizar una nueva consulta con un nuevo gameId
-          console.log("CONSULTA INCOMPLETA. SE REALIZARÁ UNA NUEVA CONSULTA.");
-          break;
-        }
-      } while (totalDataClips < limitNivel3);
-      if (totalDataClips > limitNivel3) {
-        //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
-        dataVideosCaso3 = dataVideosCaso3.slice(0, limitNivel3);
-        totalDataClips = limitNivel3;
+        response = await getDataClipsByUser(idClip.user_id, limitNivel3);
+
+        const eficiencia = (response.length * 100) / limitNivel3;
+        console.log(
+          `LA EFICIENCIA DE CLIPS CON EL ID ${idClip.user_id} ES: ${eficiencia}%. Tiene ${response.length} datos.`
+        );
       }
-      return dataVideosCaso3;
+      // do {
+      //   console.log("SE CONSULTA CON EL ID DE USUARIO: ", clips.user_id);
+      //   const response = await getDataClipsByUser(clips.user_id, limitNivel3);
+      //   if (response.length > 0 && response.length >= limitNivel3) {
+      //     for (const dataClips of response) {
+      //       dataVideosCaso3.push(dataClips);
+      //       totalDataClips += response.length;
+      //     }
+      //   }
+      //   if (dataVideosCaso3.length < limitNivel3) {
+      // Realizar una nueva consulta con un nuevo gameId
+      //     console.log("CONSULTA INCOMPLETA. SE REALIZARÁ UNA NUEVA CONSULTA.");
+      //     break;
+      //   }
+      // } while (totalDataClips < limitNivel3);
+      // if (totalDataClips > limitNivel3) {
+      //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
+      //   dataVideosCaso3 = dataVideosCaso3.slice(0, limitNivel3);
+      //   totalDataClips = limitNivel3;
+      // }
+      return response;
     },
   },
   ClipsByUserId: {
