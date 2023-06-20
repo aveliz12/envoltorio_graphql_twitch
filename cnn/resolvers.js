@@ -32,7 +32,7 @@ const resolvers = {
         console.log(error);
       }
     },
-    getCasosPruebasLiveStreams: async (_, { limitNivel1 = 50 }) => {
+    getCasosPruebasLiveStreams: async (_, { limitNivel1 }) => {
       try {
         const data = await getDataLiveStreams(limitNivel1);
         return data;
@@ -89,42 +89,18 @@ const resolvers = {
         dataVideo.push(video);
         for (const idVideo of dataVideo) {
           if (idVideo.game_id.trim() === "") {
-            console.log("ID vacío encontrado. Saltando consulta de videos...");
+            //console.log("ID vacío encontrado. Saltando consulta de videos...");
             continue;
           }
           response = await getDataVideos(idVideo.game_id, limitNivel2);
-          //if (response.length >= limitNivel2) {
-          //idCount++;
-          const eficiencia = (response.length * 100) / limitNivel2;
-          //}
+
+          const eficiencia = ((response.length * 100) / limitNivel2).toFixed(2);
+
           console.log(
             `LA EFICIENCIA DE VIDEOS CON EL ID ${idVideo.game_id} ES: ${eficiencia}%.`
           );
         }
-        // do {
-        //   if (video.game_id.trim() === "") {
-        //     console.log("ID vacío encontrado. Saltando consulta de videos...");
-        //     continue;
-        //   }
-        //   const response = await getDataVideos(video.game_id, limitNivel2);
-        //   if (response.length >= limitNivel2 && response.length > 0) {
-        //     for (const data of response) {
-        //       dataVideosCaso2.push(data);
-        //       totalDataVideos++;
-        //     }
-        //   }
-        //   if (dataVideosCaso2.length < limitNivel2) {
-        //     // Realizar una nueva consulta con un nuevo gameId
-        //     console.log(
-        //       "CONSULTA INCOMPLETA. SE REALIZARÁ UNA NUEVA CONSULTA."
-        //     );
-        //     break;
-        //   }
-        // } while (totalDataVideos < limitNivel2);
-        // if (totalDataVideos > limitNivel2) {
-        //   dataVideosCaso2 = dataVideosCaso2.slice(0, limitNivel2);
-        //   totalDataVideos = limitNivel2;
-        // }
+
         return response;
       } catch (error) {
         console.log(error);
@@ -137,36 +113,17 @@ const resolvers = {
       dataVideosCaso3.push(clips);
       for (const idClip of dataVideosCaso3) {
         if (idClip.user_id.trim() === "") {
-          console.log("ID vacío encontrado. Saltando consulta de videos...");
+          //console.log("ID vacío encontrado. Saltando consulta de videos...");
           continue;
         }
         response = await getDataClipsByUser(idClip.user_id, limitNivel3);
 
-        const eficiencia = (response.length * 100) / limitNivel3;
+        const eficiencia = ((response.length * 100) / limitNivel3).toFixed(2);
         console.log(
           `LA EFICIENCIA DE CLIPS CON EL ID ${idClip.user_id} ES: ${eficiencia}%. Tiene ${response.length} datos.`
         );
       }
-      // do {
-      //   console.log("SE CONSULTA CON EL ID DE USUARIO: ", clips.user_id);
-      //   const response = await getDataClipsByUser(clips.user_id, limitNivel3);
-      //   if (response.length > 0 && response.length >= limitNivel3) {
-      //     for (const dataClips of response) {
-      //       dataVideosCaso3.push(dataClips);
-      //       totalDataClips += response.length;
-      //     }
-      //   }
-      //   if (dataVideosCaso3.length < limitNivel3) {
-      // Realizar una nueva consulta con un nuevo gameId
-      //     console.log("CONSULTA INCOMPLETA. SE REALIZARÁ UNA NUEVA CONSULTA.");
-      //     break;
-      //   }
-      // } while (totalDataClips < limitNivel3);
-      // if (totalDataClips > limitNivel3) {
-      //se utiliza el método slice para reducir la longitud del arreglo dataVideosForCaso2 a first elementos
-      //   dataVideosCaso3 = dataVideosCaso3.slice(0, limitNivel3);
-      //   totalDataClips = limitNivel3;
-      // }
+
       return response;
     },
   },
@@ -175,12 +132,16 @@ const resolvers = {
       const dataChannel = await getDataInformationChannel(
         channel.broadcaster_id
       );
+
+      console.log(`LA EFICIENCIA DE INFORMACIÓN DE CANAL ES: 100%.`);
       return dataChannel;
     },
   },
   ChannelInformation: {
     async informationGame(game) {
       const dataGame = await getDataInformationGame(game.game_id);
+      console.log(`LA EFICIENCIA DE INFORMACIÓN DE UN JUEGO ES: 100%.`);
+
       return dataGame;
     },
   },

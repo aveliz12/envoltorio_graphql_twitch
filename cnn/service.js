@@ -64,9 +64,7 @@ const getDataLiveStreams = async (first) => {
 
     client.setLink(
       new RestLink({
-        //bodySerializer: (body) => JSON.stringify(body),
         uri: "https://api.twitch.tv/helix/",
-        //customFetch: fetch,
         headers: {
           Authorization: "Bearer " + token,
           "Client-Id": process.env.CLIENTID,
@@ -79,18 +77,19 @@ const getDataLiveStreams = async (first) => {
         query: queryLiveStreams,
         variables: {
           limitNivel1: first > 50 ? 50 : first,
-          limitNivel2: first > 50 ? 50 : first,
           cursor: cursor === null ? "" : `&after=${cursor}`,
         },
       });
 
-      first = first - response.data.liveStreams.data.length;
-      dataStreams = [...dataStreams, ...response.data.liveStreams.data];
-      if (response.data.liveStreams.pagination.cursor !== "") {
-        cursor = response.data.liveStreams.pagination.cursor;
-      } else {
+      if (response.data.liveStreams.pagination.cursor === undefined) {
+        console.log("CURSOR VACIO")
         break;
       }
+      first = first - response.data.liveStreams.data.length;
+      dataStreams = [...dataStreams, ...response.data.liveStreams.data];
+      
+      cursor = response.data.liveStreams.pagination.cursor;
+      
     }
     return dataStreams;
   } catch (error) {
