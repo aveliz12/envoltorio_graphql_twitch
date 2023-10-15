@@ -85,21 +85,24 @@ const resolvers = {
     async videosByGame(video, { limitNivel2 = 50 }) {
       try {
         let response;
-        const dataVideo = [];
-        dataVideo.push(video);
-        for (const idVideo of dataVideo) {
-          if (idVideo.game_id.trim() === "") {
-            //console.log("ID vacío encontrado. Saltando consulta de videos...");
-            continue;
-          }
-          response = await getDataVideos(idVideo.game_id, limitNivel2);
 
-          const eficiencia = ((response.length * 100) / limitNivel2).toFixed(2);
+        await Promise.all(
+          [video].map(async (videoByGame) => {
+            if (videoByGame.game_id.trim() === "") {
+              //console.log("ID vacío encontrado. Saltando consulta de videos...");
+              return null;
+            }
 
-          console.log(
-            `LA EFICIENCIA DE VIDEOS CON EL ID ${idVideo.game_id} ES: ${eficiencia}%.`
-          );
-        }
+            response = await getDataVideos(videoByGame.game_id, limitNivel2);
+            const eficiencia = ((response.length * 100) / limitNivel2).toFixed(
+              2
+            );
+
+            console.log(
+              `LA EFICIENCIA DE VIDEOS CON EL ID ${videoByGame.game_id} ES: ${eficiencia}%.`
+            );
+          })
+        );
 
         return response;
       } catch (error) {
@@ -109,20 +112,20 @@ const resolvers = {
   },
   VideosByGame: {
     async clipsByUser(clips, { limitNivel3 = 50 }) {
-      let dataVideosCaso3 = [];
-      dataVideosCaso3.push(clips);
-      for (const idClip of dataVideosCaso3) {
-        if (idClip.user_id.trim() === "") {
+      const dataPromiseClips = [clips].map(async (clipsByUser) => {
+        if (clipsByUser.user_id.trim() === "") {
           //console.log("ID vacío encontrado. Saltando consulta de videos...");
-          continue;
+          return null;
         }
-        response = await getDataClipsByUser(idClip.user_id, limitNivel3);
+        response = await getDataClipsByUser(clipsByUser.user_id, limitNivel3);
 
         const eficiencia = ((response.length * 100) / limitNivel3).toFixed(2);
         console.log(
-          `LA EFICIENCIA DE CLIPS CON EL ID ${idClip.user_id} ES: ${eficiencia}%. Tiene ${response.length} datos.`
+          `LA EFICIENCIA DE CLIPS CON EL ID ${clipsByUser.user_id} ES: ${eficiencia}%. Tiene ${response.length} datos.`
         );
-      }
+      });
+
+      await Promise.all(dataPromiseClips);
 
       return response;
     },

@@ -82,14 +82,13 @@ const getDataLiveStreams = async (first) => {
       });
 
       if (response.data.liveStreams.pagination.cursor === undefined) {
-        console.log("CURSOR VACIO")
+        console.log("CURSOR VACIO");
         break;
       }
       first = first - response.data.liveStreams.data.length;
       dataStreams = [...dataStreams, ...response.data.liveStreams.data];
-      
+
       cursor = response.data.liveStreams.pagination.cursor;
-      
     }
     return dataStreams;
   } catch (error) {
